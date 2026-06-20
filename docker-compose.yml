@@ -37,11 +37,12 @@ services:
     env_file: ./backend/.env
     environment:
       - REDIS_URL=redis://localhost:6379
+      - RUN_MIGRATIONS=false
     depends_on:
       redis:
         condition: service_healthy
-    cap_add:
-      - NET_ADMIN
+      backend:
+        condition: service_started
 
 volumes:
   redis_data:
