@@ -9,6 +9,3 @@ export function getServers() {
   return api.get('/servers/').then(r => r.data)
 }
 
-export function getTopology() {
-  return api.get('/graph/topology/').then(r => r.data)
-}

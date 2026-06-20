@@ -5,7 +5,7 @@ from typing import Optional
 
 
 WG_INTERFACE = 'wg0'
-HANDSHAKE_TTL = 60
+HANDSHAKE_TTL = 600
 
 
 @dataclass

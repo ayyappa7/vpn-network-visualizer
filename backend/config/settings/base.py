@@ -73,5 +73,5 @@ CHANNEL_LAYERS = {
 FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_build'
 
 WG_INTERFACE = os.environ.get('WG_INTERFACE', 'wg0')
-HANDSHAKE_TTL = int(os.environ.get('HANDSHAKE_TTL', '60'))
+HANDSHAKE_TTL = int(os.environ.get('HANDSHAKE_TTL', '600'))
 CHECK_INTERVAL = int(os.environ.get('CHECK_INTERVAL', '15'))

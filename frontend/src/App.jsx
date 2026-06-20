@@ -1,20 +1,17 @@
 import { useEffect } from 'react'
-import GraphView from './components/GraphView'
 import ServerList from './components/ServerList'
 import { useServers } from './hooks/useServers'
 import { useWebSocket } from './hooks/useWebSocket'
 
 export default function App() {
-  const { servers, topology, loading, error, updateFromHandshake, refresh } = useServers()
+  const { servers, loading, error, updateFromHandshake } = useServers()
   const { lastMessage, isConnected } = useWebSocket('/ws/graph/')
 
   useEffect(() => {
     if (lastMessage?.type === 'handshake.update') {
       updateFromHandshake(lastMessage)
-    } else if (lastMessage?.type === 'topology') {
-      refresh()
     }
-  }, [lastMessage, updateFromHandshake, refresh])
+  }, [lastMessage, updateFromHandshake])
 
   return (
     <div>
@@ -22,7 +19,7 @@ export default function App() {
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1><span>VPN</span> Network Monitor</h1>
-            <div className="subtitle">WireGuard Hub-Spoke Topology</div>
+            <div className="subtitle">WireGuard Peers</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{
@@ -48,13 +45,10 @@ export default function App() {
         {loading ? (
           <div className="loading">
             <div className="spinner" />
-            Loading network topology...
+            Loading peers...
           </div>
         ) : (
-          <>
-            <GraphView topology={topology} />
-            <ServerList servers={servers} />
-          </>
+          <ServerList servers={servers} />
         )}
       </main>
     </div>
