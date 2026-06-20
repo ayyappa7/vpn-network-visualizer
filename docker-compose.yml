@@ -10,13 +10,3 @@ services:
     env_file: ./backend/.env
     cap_add:
       - NET_ADMIN
-
-  scheduler:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    network_mode: host
-    command: python manage.py run_scheduler
-    env_file: ./backend/.env
-    depends_on:
-      - backend
