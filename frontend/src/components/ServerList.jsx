@@ -50,17 +50,18 @@ export default function ServerList({ servers, onPing }) {
       <div className="servers-header">
         <h2>WireGuard Peers ({servers.length})</h2>
       </div>
+      <div className="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Peer</th>
-            <th>Allowed IPs</th>
-            <th>Endpoint</th>
+            <th className="hide-mobile">Allowed IPs</th>
+            <th className="hide-mobile">Endpoint</th>
             <th>Status</th>
             <th>Handshake</th>
             <th>Ping</th>
             <th></th>
-            <th>Traffic</th>
+            <th className="hide-mobile">Traffic</th>
           </tr>
         </thead>
         <tbody>
@@ -68,18 +69,18 @@ export default function ServerList({ servers, onPing }) {
             <tr key={s.public_key} className={s.is_reachable ? 'status-up' : 'status-down'}>
               <td>
                 <strong>{s.name || primaryIp(s)}</strong>
-                <div style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'monospace', marginTop: 2 }}>
+                <div className="pubkey-hint">
                   {s.public_key?.slice(0, 20)}...
                 </div>
               </td>
-              <td>
-                <code style={{ fontSize: '0.8rem', color: '#93c5fd' }}>{s.allowed_ips || '—'}</code>
+              <td className="hide-mobile">
+                <code className="ip-code">{s.allowed_ips || '—'}</code>
               </td>
-              <td style={{ fontSize: '0.8rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+              <td className="hide-mobile ep-cell">
                 {s.endpoint || '—'}
               </td>
               <td>{statusBadge(s)}</td>
-              <td style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+              <td className="hs-cell">
                 {formatTime(s.last_handshake)}
               </td>
               <td>{pingBadge(s)}</td>
@@ -92,13 +93,14 @@ export default function ServerList({ servers, onPing }) {
                   {s.ping_pending ? '...' : 'Ping'}
                 </button>
               </td>
-              <td style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>
+              <td className="hide-mobile traffic-cell">
                 {formatBytes(s.rx_bytes || 0)} ↓ / {formatBytes(s.tx_bytes || 0)} ↑
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
       <div style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#64748b', borderTop: '1px solid #334155' }}>
         Auto-detected from <code>$ wg show wg0 dump</code> &middot; Updates every 15s
       </div>

@@ -19,13 +19,13 @@ body {
 
 header {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  padding: 16px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #475569;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 header h1 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #f1f5f9;
 }
@@ -36,7 +36,7 @@ header h1 span {
 
 header .subtitle {
   color: #94a3b8;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 .graph-container {
@@ -112,22 +112,35 @@ table {
   border-collapse: collapse;
 }
 
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
 table th {
   text-align: left;
-  padding: 12px 16px;
-  font-size: 0.75rem;
+  padding: 10px 12px;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   color: #94a3b8;
   background: #0f172a;
   border-bottom: 1px solid #334155;
+  white-space: nowrap;
 }
 
 table td {
-  padding: 12px 16px;
-  font-size: 0.875rem;
+  padding: 10px 12px;
+  font-size: 0.8rem;
   border-bottom: 1px solid #1e293b;
   color: #e2e8f0;
+  white-space: nowrap;
 }
 
 table tr:hover {
@@ -344,8 +357,88 @@ table tr.status-up td:first-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 48px 24px;
   color: #64748b;
+}
+
+.pubkey-hint {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: monospace;
+  margin-top: 2px;
+}
+
+.ip-code {
+  font-size: 0.75rem;
+  color: #93c5fd;
+}
+
+.ep-cell,
+.hs-cell,
+.traffic-cell {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+@media (max-width: 640px) {
+  .pubkey-hint {
+    font-size: 0.6rem;
+  }
+
+  .ip-code {
+    font-size: 0.65rem;
+  }
+
+  .ep-cell,
+  .hs-cell,
+  .traffic-cell {
+    font-size: 0.65rem;
+  }
+  .container {
+    padding: 0 12px;
+  }
+
+  header {
+    padding: 10px 0;
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-size: 1rem;
+  }
+
+  header .subtitle {
+    font-size: 0.7rem;
+  }
+
+  .servers-header h2 {
+    font-size: 1rem;
+  }
+
+  .servers-header {
+    padding: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+    font-size: 0.7rem;
+  }
+
+  .badge {
+    padding: 2px 6px;
+    font-size: 0.65rem;
+  }
+
+  .btn-sm {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
 }
 
 @keyframes spin {
