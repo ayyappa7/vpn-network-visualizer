@@ -6,8 +6,9 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 
 
-WG_INTERFACE = 'wg0'
-HANDSHAKE_TTL = 600
+def _get_setting(name, default):
+    from django.conf import settings
+    return getattr(settings, name, default)
 
 
 @dataclass
@@ -35,8 +36,9 @@ class Peer:
     def is_reachable(self) -> bool:
         if not self.last_handshake:
             return False
+        ttl = _get_setting('HANDSHAKE_TTL', 600)
         diff = (datetime.now(timezone.utc) - self.last_handshake).total_seconds()
-        return diff < HANDSHAKE_TTL
+        return diff < ttl
 
     def to_dict(self):
         d = asdict(self)
@@ -48,7 +50,7 @@ class Peer:
 
 
 def get_interface_name() -> str:
-    return WG_INTERFACE
+    return _get_setting('WG_INTERFACE', 'wg0')
 
 
 def get_peers() -> list[Peer]:
