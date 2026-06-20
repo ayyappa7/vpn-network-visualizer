@@ -1,11 +1,10 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ServerViewSet, HandshakeResultViewSet
+from django.urls import path
+from .views import PeerViewSet
 
-router = DefaultRouter()
-router.register(r'', ServerViewSet, basename='server')
-router.register(r'handshakes', HandshakeResultViewSet, basename='handshake')
+peer_list = PeerViewSet.as_view({'get': 'list'})
+peer_topology = PeerViewSet.as_view({'get': 'topology'})
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', peer_list, name='peer-list'),
+    path('topology/', peer_topology, name='peer-topology'),
 ]

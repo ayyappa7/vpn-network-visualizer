@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-
   backend:
     build:
       context: .
@@ -20,11 +8,6 @@ services:
     network_mode: host
     command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
     env_file: ./backend/.env
-    environment:
-      - REDIS_URL=redis://localhost:6379
-    depends_on:
-      redis:
-        condition: service_healthy
     cap_add:
       - NET_ADMIN
 
@@ -35,14 +18,5 @@ services:
     network_mode: host
     command: python manage.py run_scheduler
     env_file: ./backend/.env
-    environment:
-      - REDIS_URL=redis://localhost:6379
-      - RUN_MIGRATIONS=false
     depends_on:
-      redis:
-        condition: service_healthy
-      backend:
-        condition: service_started
-
-volumes:
-  redis_data:
+      - backend
