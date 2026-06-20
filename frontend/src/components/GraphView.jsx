@@ -129,14 +129,14 @@ export default function GraphView({ topology }) {
         }
 
         let info = `${data.label}\n`
-        info += `IP: ${data.ip}\n`
         info += `Status: ${data.status}\n`
+        if (data.allowed_ips) info += `Allowed IPs: ${data.allowed_ips}\n`
+        if (data.endpoint) info += `Endpoint: ${data.endpoint}\n`
         if (data.last_handshake) {
           const time = new Date(data.last_handshake).toLocaleTimeString()
           info += `Last handshake: ${time}\n`
         }
-        info += `RX: ${formatBytes(data.rx_bytes || 0)}\n`
-        info += `TX: ${formatBytes(data.tx_bytes || 0)}`
+        info += `RX: ${formatBytes(data.rx_bytes || 0)}  TX: ${formatBytes(data.tx_bytes || 0)}`
 
         const tooltip = document.createElement('div')
         tooltip.style.cssText = `
@@ -183,6 +183,8 @@ export default function GraphView({ topology }) {
           status: n.status,
           ip: n.ip,
           public_key: n.public_key,
+          endpoint: n.endpoint,
+          allowed_ips: n.allowed_ips,
           last_handshake: n.last_handshake,
           rx_bytes: n.rx_bytes,
           tx_bytes: n.tx_bytes,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getServers, createServer, updateServer, deleteServer, getTopology } from '../services/api'
+import { getServers, getTopology } from '../services/api'
 
 export function useServers() {
   const [servers, setServers] = useState([])
@@ -31,30 +31,13 @@ export function useServers() {
     Promise.all([fetchServers(), fetchTopology()]).finally(() => setLoading(false))
   }, [fetchServers, fetchTopology])
 
-  const addServer = async (data) => {
-    const server = await createServer(data)
-    await fetchServers()
-    return server
-  }
-
-  const editServer = async (id, data) => {
-    const server = await updateServer(id, data)
-    await fetchServers()
-    return server
-  }
-
-  const removeServer = async (id) => {
-    await deleteServer(id)
-    await fetchServers()
-  }
-
   const updateFromHandshake = useCallback((handshakeData) => {
     if (!handshakeData || handshakeData.type !== 'handshake.update') return
     const { peers } = handshakeData
     if (!peers) return
 
     setServers(prev => prev.map(s => {
-      const peer = peers.find(p => p.peer_public_key === s.public_key || p.peer_ip === s.wireguard_ip)
+      const peer = peers.find(p => p.public_key === s.public_key)
       if (peer) {
         return {
           ...s,
@@ -69,9 +52,10 @@ export function useServers() {
 
     setTopology(prev => {
       if (!prev) return prev
-      const nodeMap = {}
+      const peerMap = {}
       for (const peer of peers) {
-        nodeMap[peer.peer_ip] = {
+        const ip = peer.allowed_ips?.split(',')[0]?.trim()?.split('/')[0] || peer.public_key?.slice(0, 16)
+        peerMap[ip] = {
           status: peer.is_reachable ? 'reachable' : 'unreachable',
           last_handshake: peer.last_handshake,
           rx_bytes: peer.rx_bytes,
@@ -82,14 +66,14 @@ export function useServers() {
         ...prev,
         updated_at: handshakeData.timestamp,
         nodes: prev.nodes.map(n => {
-          if (n.type === 'spoke' && nodeMap[n.ip]) {
-            return { ...n, ...nodeMap[n.ip] }
+          if (n.type === 'spoke' && peerMap[n.ip || n.id]) {
+            return { ...n, ...peerMap[n.ip || n.id] }
           }
           return n
         }),
         edges: prev.edges.map(e => {
-          if (nodeMap[e.target]) {
-            return { ...e, reachable: nodeMap[e.target].status === 'reachable' }
+          if (peerMap[e.target]) {
+            return { ...e, reachable: peerMap[e.target].status === 'reachable' }
           }
           return e
         }),
@@ -97,15 +81,5 @@ export function useServers() {
     })
   }, [])
 
-  return {
-    servers,
-    topology,
-    loading,
-    error,
-    addServer,
-    editServer,
-    removeServer,
-    refresh: fetchServers,
-    updateFromHandshake,
-  }
+  return { servers, topology, loading, error, refresh: fetchServers, updateFromHandshake }
 }

@@ -5,20 +5,16 @@ import { useServers } from './hooks/useServers'
 import { useWebSocket } from './hooks/useWebSocket'
 
 export default function App() {
-  const {
-    servers, topology, loading, error,
-    addServer, editServer, removeServer, updateFromHandshake, refresh,
-  } = useServers()
-
+  const { servers, topology, loading, error, updateFromHandshake, refresh } = useServers()
   const { lastMessage, isConnected } = useWebSocket('/ws/graph/')
 
   useEffect(() => {
     if (lastMessage?.type === 'handshake.update') {
       updateFromHandshake(lastMessage)
     } else if (lastMessage?.type === 'topology') {
-      // Full topology snapshot from WebSocket
+      refresh()
     }
-  }, [lastMessage, updateFromHandshake])
+  }, [lastMessage, updateFromHandshake, refresh])
 
   return (
     <div>
@@ -31,8 +27,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{
               display: 'inline-block',
-              width: 8,
-              height: 8,
+              width: 8, height: 8,
               borderRadius: '50%',
               background: isConnected ? '#22c55e' : '#ef4444',
             }} />
@@ -58,13 +53,7 @@ export default function App() {
         ) : (
           <>
             <GraphView topology={topology} />
-
-            <ServerList
-              servers={servers}
-              onAdd={addServer}
-              onEdit={editServer}
-              onDelete={removeServer}
-            />
+            <ServerList servers={servers} />
           </>
         )}
       </main>
