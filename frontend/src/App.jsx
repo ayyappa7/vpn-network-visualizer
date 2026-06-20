@@ -4,7 +4,7 @@ import { useServers } from './hooks/useServers'
 import { useWebSocket } from './hooks/useWebSocket'
 
 export default function App() {
-  const { servers, loading, error, updateFromHandshake } = useServers()
+  const { servers, loading, error, updateFromHandshake, triggerPing } = useServers()
   const { lastMessage, isConnected } = useWebSocket('/ws/graph/')
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function App() {
             Loading peers...
           </div>
         ) : (
-          <ServerList servers={servers} />
+          <ServerList servers={servers} onPing={triggerPing} />
         )}
       </main>
     </div>

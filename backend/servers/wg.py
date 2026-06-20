@@ -1,3 +1,4 @@
+import re
 import subprocess
 import concurrent.futures
 from datetime import datetime, timezone
@@ -91,18 +92,21 @@ def get_peers() -> list[Peer]:
         return []
 
 
-def ping_ip(ip: str, timeout: int = 3) -> bool:
+def ping_ip(ip: str, timeout: int = 3) -> Optional[float]:
     try:
         result = subprocess.run(
             ["ping", "-c", "1", "-W", str(timeout), ip],
             capture_output=True, text=True, timeout=timeout + 1
         )
-        return result.returncode == 0
+        if result.returncode != 0:
+            return None
+        match = re.search(r'time=(\d+\.?\d*)\s*ms', result.stdout)
+        return float(match.group(1)) if match else None
     except Exception:
-        return False
+        return None
 
 
-def get_ping_results(peers: list[Peer], timeout: int = 3) -> dict[str, bool]:
+def get_ping_results(peers: list[Peer], timeout: int = 3) -> dict[str, Optional[float]]:
     results = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         future_to_key = {

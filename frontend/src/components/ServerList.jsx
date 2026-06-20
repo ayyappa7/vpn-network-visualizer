@@ -1,4 +1,4 @@
-export default function ServerList({ servers }) {
+export default function ServerList({ servers, onPing }) {
   if (servers.length === 0) {
     return (
       <div className="servers-section">
@@ -30,9 +30,14 @@ export default function ServerList({ servers }) {
   }
 
   function pingBadge(server) {
-    if (server.ping_reachable === true) return <span className="badge badge-success">Online</span>
-    if (server.ping_reachable === false) return <span className="badge badge-danger">Offline</span>
-    return <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>...</span>
+    if (server.ping_pending) return <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>pinging...</span>
+    if (server.ping_latency_ms !== undefined && server.ping_latency_ms !== null) {
+      const ms = server.ping_latency_ms.toFixed(1)
+      const color = ms < 50 ? '#22c55e' : ms < 150 ? '#eab308' : '#ef4444'
+      return <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color }}>{ms}ms</span>
+    }
+    if (server.ping_reachable === false) return <span className="badge badge-danger">Timeout</span>
+    return <span style={{ fontSize: '0.75rem', color: '#64748b' }}>—</span>
   }
 
   function primaryIp(server) {
@@ -54,6 +59,7 @@ export default function ServerList({ servers }) {
             <th>Status</th>
             <th>Handshake</th>
             <th>Ping</th>
+            <th></th>
             <th>Traffic</th>
           </tr>
         </thead>
@@ -77,6 +83,19 @@ export default function ServerList({ servers }) {
                 {formatTime(s.last_handshake)}
               </td>
               <td>{pingBadge(s)}</td>
+              <td>
+                <button
+                  onClick={() => onPing?.(s.public_key)}
+                  disabled={s.ping_pending}
+                  style={{
+                    padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer',
+                    background: '#1e293b', color: '#94a3b8', border: '1px solid #334155',
+                    borderRadius: 4,
+                  }}
+                >
+                  {s.ping_pending ? '...' : 'Ping'}
+                </button>
+              </td>
               <td style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>
                 {formatBytes(s.rx_bytes || 0)} ↓ / {formatBytes(s.tx_bytes || 0)} ↑
               </td>

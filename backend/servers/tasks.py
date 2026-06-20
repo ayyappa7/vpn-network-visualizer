@@ -10,7 +10,9 @@ def check_handshakes():
     enriched = []
     for p in peers:
         d = p.to_dict()
-        d['ping_reachable'] = ping_results.get(p.public_key)
+        latency = ping_results.get(p.public_key)
+        d['ping_latency_ms'] = latency
+        d['ping_reachable'] = latency is not None
         enriched.append(d)
     broadcast_handshake_update(enriched)
     return enriched
