@@ -8,11 +8,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://host.docker.internal:8000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://host.docker.internal:8000',
+        target: 'ws://localhost:8000',
         ws: true,
       },
     },

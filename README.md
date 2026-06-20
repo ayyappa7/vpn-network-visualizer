@@ -1,72 +1,74 @@
 # VPN Network Monitor
 
-Real-time WireGuard peer monitoring with a Django + React dashboard. Uses `wg show` to track handshake status of VPN peers.
+Real-time WireGuard peer monitoring via `wg show wg0`. Shows hub-spoke topology with reachability status.
+
+## Stack
+- **Backend**: Django 4.2 + DRF + Channels (Daphne ASGI)
+- **Frontend**: React 18 + Vite + Cytoscape.js
+- **Real-time**: WebSocket via Redis channel layer
+- **Scheduler**: APScheduler checks `wg show` every 15s
 
 ## Architecture
 
-- **Backend**: Django 4.2 + DRF + Channels (ASGI via Daphne)
-- **Frontend**: React 18 + Vite + Cytoscape.js
-- **Real-time**: WebSocket via Redis channel layer
-- **Scheduler**: APScheduler checks `wg show wg0` every N seconds
+```
+Browser → http://server:5173
+              │
+          Vite (host networking)
+          ├── /api/* → proxy → localhost:8000 (Daphne)
+          └── /ws/*  → proxy → localhost:8000 (Daphne)
+                                  │
+                           Backend (host networking)
+                           ├── Daphne ASGI server
+                           ├── APScheduler (wg show)
+                           └── Redis channel layer
+```
 
-## Prerequisites
-
-- Linux server with WireGuard configured (`wg0` interface)
-- Docker + Docker Compose
-- WireGuard peers with `PersistentKeepalive = 25` in their config
+All services use `network_mode: host` for direct `wg` command access.
 
 ## Quick Start
 
 ```bash
-# 1. Clone and start (migrations run automatically)
-docker compose up -d
+# On your WireGuard hub server:
+git clone <repo>
+cd vpn-monitor
 
-# 2. Access the UI
+# Build and start
+docker compose up -d --build
+
+# Open browser
 open http://<server-ip>:5173
 
-# 3. Add your WireGuard peers via the UI
+# Add your peers via the UI
 ```
 
-## Configuration
+## Adding a Peer
 
-Edit `backend/.env`:
+1. Open the web UI
+2. Click "+ Add Server"
+3. Enter:
+   - **Name**: e.g. `web-01`
+   - **WireGuard IP**: e.g. `10.8.0.2`
+   - **Public Key**: Optional (auto-detected from `wg show`)
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `WG_INTERFACE` | `wg0` | WireGuard interface to monitor |
-| `HANDSHAKE_TTL` | `60` | Seconds since last handshake to consider peer reachable |
-| `CHECK_INTERVAL` | `15` | Seconds between `wg show` checks |
-| `REDIS_URL` | `redis://localhost:6379` | Redis connection string |
+## Troubleshooting
 
-## How it Works
+```bash
+# Check backend logs
+docker compose logs backend
 
-1. APScheduler runs `wg show wg0 latest-handshakes` every 15s
-2. Parses peer public keys → handshake timestamps → transfer stats
-3. Auto-discovers new peers via `wg show wg0 endpoints`
-4. Stores results in DB (auto-cleaned after 1 minute)
-5. Broadcasts updates to all WebSocket clients
-6. React renders real-time graph (green=reachable, red=unreachable)
+# Check scheduler logs
+docker compose logs scheduler
 
-## WireGuard Setup Template
+# Test API directly
+curl http://localhost:8000/api/servers/
+curl http://localhost:8000/api/graph/topology/
 
-On the monitor server's `wg0.conf`:
+# Check WireGuard is accessible
+docker compose exec backend wg show wg0 latest-handshakes
 
-```ini
-[Interface]
-Address = 10.8.0.1/24
-PrivateKey = ...
-
-[Peer]
-# Server A
-PublicKey = <peer-pubkey>
-AllowedIPs = 10.8.0.2/32
-PersistentKeepalive = 25
-
-[Peer]
-# Server B
-PublicKey = <peer-pubkey>
-AllowedIPs = 10.8.0.3/32
-PersistentKeepalive = 25
+# Frontend at http://server-ip:5173
+# API at http://server-ip:8000/api/
+# WebSocket at ws://server-ip:8000/ws/graph/
 ```
 
 ## API Endpoints
@@ -81,15 +83,13 @@ PersistentKeepalive = 25
 | GET | `/api/graph/topology/` | Graph data |
 | WS | `/ws/graph/` | Real-time updates |
 
-## Deployment
+## Configuration
 
-```bash
-# Production
-docker compose -f docker-compose.yml up -d --build
+Edit `backend/.env`:
 
-# View logs
-docker compose logs -f backend scheduler frontend
-
-# Create admin user (optional)
-docker compose exec backend python manage.py createsuperuser
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WG_INTERFACE` | `wg0` | WireGuard interface to monitor |
+| `HANDSHAKE_TTL` | `60` | Seconds since last handshake to consider peer reachable |
+| `CHECK_INTERVAL` | `15` | Seconds between `wg show` checks |
+| `REDIS_URL` | `redis://localhost:6379` | Redis connection string |
