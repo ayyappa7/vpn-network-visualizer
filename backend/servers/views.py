@@ -1,21 +1,13 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .wg import get_peers, get_ping_results, ping_ip, get_topology
+from .wg import get_peers, ping_ip, get_topology
 
 
 class PeerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request):
         peers = get_peers()
-        ping_results = get_ping_results(peers)
-        data = []
-        for p in peers:
-            d = p.to_dict()
-            latency = ping_results.get(p.public_key)
-            d['ping_latency_ms'] = latency
-            d['ping_reachable'] = latency is not None
-            data.append(d)
-        return Response(data)
+        return Response([p.to_dict() for p in peers])
 
     @action(detail=False, methods=['post'])
     def ping(self, request):
