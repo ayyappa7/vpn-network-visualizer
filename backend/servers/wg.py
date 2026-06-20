@@ -1,4 +1,5 @@
 import subprocess
+import concurrent.futures
 from datetime import datetime, timezone
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -88,6 +89,30 @@ def get_peers() -> list[Peer]:
     except Exception as e:
         print(f"Error running wg show: {e}")
         return []
+
+
+def ping_ip(ip: str, timeout: int = 3) -> bool:
+    try:
+        result = subprocess.run(
+            ["ping", "-c", "1", "-W", str(timeout), ip],
+            capture_output=True, text=True, timeout=timeout + 1
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+
+def get_ping_results(peers: list[Peer], timeout: int = 3) -> dict[str, bool]:
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_key = {
+            executor.submit(ping_ip, p.primary_ip, timeout): p.public_key
+            for p in peers if p.primary_ip
+        }
+        for future in concurrent.futures.as_completed(future_to_key):
+            pubkey = future_to_key[future]
+            results[pubkey] = future.result()
+    return results
 
 
 def get_topology() -> dict:

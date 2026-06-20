@@ -33,6 +33,7 @@ export function useServers() {
           ...s,
           last_handshake: peer.last_handshake,
           is_reachable: peer.is_reachable,
+          ping_reachable: peer.ping_reachable,
           rx_bytes: peer.rx_bytes,
           tx_bytes: peer.tx_bytes,
         }

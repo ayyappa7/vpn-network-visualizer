@@ -29,6 +29,12 @@ export default function ServerList({ servers }) {
     return <span className="badge badge-danger">Unreachable</span>
   }
 
+  function pingBadge(server) {
+    if (server.ping_reachable === true) return <span className="badge badge-success">Online</span>
+    if (server.ping_reachable === false) return <span className="badge badge-danger">Offline</span>
+    return <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>...</span>
+  }
+
   function primaryIp(server) {
     if (!server.allowed_ips) return '—'
     return server.allowed_ips.split(',')[0].trim().split('/')[0]
@@ -47,6 +53,7 @@ export default function ServerList({ servers }) {
             <th>Endpoint</th>
             <th>Status</th>
             <th>Handshake</th>
+            <th>Ping</th>
             <th>Traffic</th>
           </tr>
         </thead>
@@ -69,6 +76,7 @@ export default function ServerList({ servers }) {
               <td style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                 {formatTime(s.last_handshake)}
               </td>
+              <td>{pingBadge(s)}</td>
               <td style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>
                 {formatBytes(s.rx_bytes || 0)} ↓ / {formatBytes(s.tx_bytes || 0)} ↑
               </td>
