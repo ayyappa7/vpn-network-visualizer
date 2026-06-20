@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .wg import get_peers, ping_ip, get_topology
+from .wg import get_peers, ping_ip
 
 
 class PeerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -27,7 +27,3 @@ class PeerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             'ping_reachable': latency is not None,
             'ping_latency_ms': latency,
         })
-
-    @action(detail=False, methods=['get'])
-    def topology(self, request):
-        return Response(get_topology())

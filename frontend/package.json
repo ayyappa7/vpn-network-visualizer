@@ -11,8 +11,6 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "cytoscape": "^3.28.1",
-    "cytoscape-cose-bilkent": "^4.1.0",
     "axios": "^1.6.7"
   },
   "devDependencies": {

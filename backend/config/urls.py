@@ -4,7 +4,6 @@ from .views import serve_spa
 
 urlpatterns = [
     path('api/servers/', include('servers.urls')),
-    path('api/graph/', include('graph.urls')),
 ]
 
 if hasattr(settings, 'FRONTEND_BUILD_DIR') and settings.FRONTEND_BUILD_DIR.exists():

@@ -12,7 +12,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'channels',
     'servers',
-    'graph',
 ]
 
 MIDDLEWARE = [
