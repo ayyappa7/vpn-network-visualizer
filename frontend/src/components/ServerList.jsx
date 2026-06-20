@@ -85,7 +85,7 @@ export default function ServerList({ servers, onPing }) {
               <td>{pingBadge(s)}</td>
               <td>
                 <button
-                  className="btn btn-sm btn-ghost"
+                  className="btn btn-sm btn-primary"
                   onClick={() => onPing?.(s.public_key)}
                   disabled={s.ping_pending}
                 >
