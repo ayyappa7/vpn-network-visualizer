@@ -81,7 +81,7 @@ def get_peers() -> list[Peer]:
                 last_handshake=last_hs,
                 rx_bytes=int(parts[5]) if parts[5] else 0,
                 tx_bytes=int(parts[6]) if parts[6] else 0,
-                persistent_keepalive=int(parts[7]) if parts[7] else None,
+                persistent_keepalive=int(parts[7]) if parts[7] and parts[7].isdigit() else None,
             ))
 
         return peers
