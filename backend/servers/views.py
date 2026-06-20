@@ -1,15 +1,14 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Max, Subquery, OuterRef
+from django.db.models import Subquery, OuterRef
 from django.utils import timezone
-from datetime import timedelta
 from .models import Server, HandshakeResult
 from .serializers import ServerSerializer, ServerListSerializer, HandshakeResultSerializer
 
 
 class ServerViewSet(viewsets.ModelViewSet):
-    queryset = Server.objects.filter(is_active=True)
+    queryset = Server.objects.all()
     serializer_class = ServerSerializer
 
     def get_serializer_class(self):
@@ -19,19 +18,14 @@ class ServerViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        
-        # Annotate with latest handshake data
         latest_handshake = HandshakeResult.objects.filter(
             server=OuterRef('pk')
         ).order_by('-captured_at')
-        
-        queryset = queryset.annotate(
+        return queryset.annotate(
             last_handshake=Subquery(latest_handshake.values('last_handshake')[:1]),
-            is_reachable=Subquery(latest_handshake.values('is_reachable')[:1]),
             rx_bytes=Subquery(latest_handshake.values('rx_bytes')[:1]),
             tx_bytes=Subquery(latest_handshake.values('tx_bytes')[:1]),
         )
-        return queryset
 
     @action(detail=False, methods=['get'])
     def topology(self, request):

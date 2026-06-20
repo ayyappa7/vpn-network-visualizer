@@ -99,6 +99,8 @@ CHANNEL_LAYERS = {
     },
 }
 
+FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_build'
+
 # WireGuard monitoring settings
 WG_INTERFACE = os.environ.get('WG_INTERFACE', 'wg0')
 HANDSHAKE_TTL = int(os.environ.get('HANDSHAKE_TTL', '60'))

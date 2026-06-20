@@ -14,7 +14,9 @@ services:
       retries: 3
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     network_mode: host
     command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
     env_file: ./backend/.env
@@ -23,13 +25,13 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     cap_add:
       - NET_ADMIN
 
   scheduler:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     network_mode: host
     command: python manage.py run_scheduler
     env_file: ./backend/.env
@@ -38,20 +40,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
     cap_add:
       - NET_ADMIN
-
-  frontend:
-    build: ./frontend
-    network_mode: host
-    command: npm run dev -- --host
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
 
 volumes:
   redis_data:

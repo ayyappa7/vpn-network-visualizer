@@ -22,6 +22,9 @@ venv/
 *.swp
 *.swo
 
+# Frontend build (copied by Docker multi-stage build)
+frontend_build/
+
 # OS
 .DS_Store
 Thumbs.db
