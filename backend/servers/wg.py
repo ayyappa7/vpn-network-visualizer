@@ -141,7 +141,7 @@ def get_topology() -> dict:
             status = 'reachable'
         elif peer.last_handshake:
             time_since = (now - peer.last_handshake).total_seconds()
-            if time_since < 120:
+            if time_since < 600:
                 status = 'stale'
 
         node_id = peer.primary_ip or peer.public_key[:16]
