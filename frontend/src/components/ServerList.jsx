@@ -64,8 +64,8 @@ export default function ServerList({ servers, onPing }) {
           </tr>
         </thead>
         <tbody>
-          {servers.map(s => (
-            <tr key={s.id} className={s.is_reachable ? 'status-up' : 'status-down'}>
+            {servers.map(s => (
+            <tr key={s.public_key} className={s.is_reachable ? 'status-up' : 'status-down'}>
               <td>
                 <strong>{s.name || primaryIp(s)}</strong>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'monospace', marginTop: 2 }}>
@@ -85,13 +85,9 @@ export default function ServerList({ servers, onPing }) {
               <td>{pingBadge(s)}</td>
               <td>
                 <button
+                  className="btn btn-sm btn-ghost"
                   onClick={() => onPing?.(s.public_key)}
                   disabled={s.ping_pending}
-                  style={{
-                    padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer',
-                    background: '#1e293b', color: '#94a3b8', border: '1px solid #334155',
-                    borderRadius: 4,
-                  }}
                 >
                   {s.ping_pending ? '...' : 'Ping'}
                 </button>

@@ -18,6 +18,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wireguard-tools \
+    iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt .
