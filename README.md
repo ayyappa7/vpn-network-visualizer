@@ -18,16 +18,13 @@ Real-time WireGuard peer monitoring with a Django + React dashboard. Uses `wg sh
 ## Quick Start
 
 ```bash
-# 1. Clone and start
+# 1. Clone and start (migrations run automatically)
 docker compose up -d
 
-# 2. Apply migrations
-docker compose exec backend python manage.py migrate
-
-# 3. Access the UI
+# 2. Access the UI
 open http://<server-ip>:5173
 
-# 4. Add your WireGuard peers via the UI
+# 3. Add your WireGuard peers via the UI
 ```
 
 ## Configuration
