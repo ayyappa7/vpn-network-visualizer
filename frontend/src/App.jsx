@@ -4,7 +4,7 @@ import { useServers } from './hooks/useServers'
 import { useWebSocket } from './hooks/useWebSocket'
 
 export default function App() {
-  const { servers, loading, error, updateFromHandshake, triggerPing } = useServers()
+  const { servers, loading, error, updateFromHandshake, triggerPing, refresh } = useServers()
   const { lastMessage, isConnected } = useWebSocket('/ws/graph/')
 
   useEffect(() => {
@@ -21,14 +21,17 @@ export default function App() {
             <h1><span>VPN</span> Network Monitor</h1>
             <div className="subtitle">WireGuard Peers</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button className="btn btn-sm btn-ghost" onClick={refresh} disabled={loading}>
+              ↻ {loading ? '...' : 'Refresh'}
+            </button>
             <span style={{
               display: 'inline-block',
               width: 8, height: 8,
               borderRadius: '50%',
               background: isConnected ? '#22c55e' : '#ef4444',
             }} />
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+            <span className="conn-status">
               {isConnected ? 'Connected' : 'Reconnecting...'}
             </span>
           </div>

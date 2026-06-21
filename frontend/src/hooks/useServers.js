@@ -16,10 +16,15 @@ export function useServers() {
     }
   }, [])
 
-  useEffect(() => {
+  const refresh = useCallback(async () => {
     setLoading(true)
-    fetchServers().finally(() => setLoading(false))
+    await fetchServers()
+    setLoading(false)
   }, [fetchServers])
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
 
   const updateFromHandshake = useCallback((handshakeData) => {
     if (!handshakeData || handshakeData.type !== 'handshake.update') return
@@ -63,5 +68,5 @@ export function useServers() {
     }
   }, [])
 
-  return { servers, loading, error, refresh: fetchServers, updateFromHandshake, triggerPing }
+  return { servers, loading, error, refresh, updateFromHandshake, triggerPing }
 }
